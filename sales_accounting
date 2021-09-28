@@ -1,0 +1,43 @@
+CREATE TABLE product(
+product_name VARCHAR(50) PRIMARY KEY,
+unit VARCHAR(50),
+price_purchase NUMERIC(10,2) NOT NULL,
+price_selling NUMERIC(10,2) NOT NULL
+);
+
+CREATE TABLE vendor(
+passport VARCHAR(50) PRIMARY KEY,
+name VARCHAR(50),
+percent NUMERIC(10,2) NOT NULL
+);
+
+CREATE TABLE sales(
+prod_name VARCHAR(50),
+passport_vendor VARCHAR(50),
+date DATE NOT NULL,
+count INT NOT NULL,
+PRIMARY KEY (prod_name, passport_vendor, date), 
+FOREIGN KEY (prod_name) REFERENCES product (product_name),
+FOREIGN KEY (passport_vendor) REFERENCES vendor (passport)
+);
+
+INSERT INTO product (product_name, unit, price_purchase, price_selling) VALUES ('nuts', 'kg', 100, 200);
+INSERT INTO product (product_name, unit, price_purchase, price_selling) VALUES ('milk', 'liter', 30, 60);
+INSERT INTO product (product_name, unit, price_purchase, price_selling) VALUES ('hairbrush', 'apiece', 20, 50);
+
+INSERT INTO vendor (passport, name, percent) VALUES ('123 456', 'Dennis', 0.3);
+INSERT INTO vendor (passport, name, percent) VALUES ('569', 'Anna', 0.3);
+INSERT INTO vendor (passport, name, percent) VALUES ('789', 'Nikolay', 0.3);
+
+INSERT INTO sales (prod_name, passport_vendor, date, count) VALUES ('nuts', '123 456', '2019-11-10', 30);
+INSERT INTO sales (prod_name, passport_vendor, date, count) VALUES ('milk', '569', '2019-11-10', 20);
+INSERT INTO sales (prod_name, passport_vendor, date, count) VALUES ('hairbrush', '789', '2020-11-09', 36);
+INSERT INTO sales (prod_name, passport_vendor, date, count) VALUES ('nuts', '569', '2020-11-09', 30);
+
+CREATE VIEW profit AS
+SELECT sales.prod_name, sales.passport_vendor, vendor.name, sales.date, (product.price_selling - product.price_purchase) * sales.count AS income, product.price_selling * sales.count * vendor.percent AS pay 
+FROM sales
+JOIN product ON product.product_name = sales.prod_name
+JOIN vendor ON vendor.passport = sales.passport_vendor;
+
+SELECT * FROM profit;

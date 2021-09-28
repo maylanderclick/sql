@@ -1,0 +1,66 @@
+CREATE DATABASE hospital;
+
+\c hospital 
+
+CREATE TABLE doctors(
+id SERIAL PRIMARY KEY,
+name_doc VARCHAR(50), 
+speciality VARCHAR(50),
+price NUMERIC(10,2) NOT NULL,
+percent NUMERIC(10,2) NOT NULL
+);
+
+CREATE TABLE patient(
+passport VARCHAR(50) PRIMARY KEY,
+surname VARCHAR(50),
+name_patient VARCHAR(50),
+patronymic VARCHAR(50),
+birthdate DATE NOT NULL,
+address VARCHAR(50)
+);
+
+
+CREATE TABLE reception(
+doctor_id INT NOT NULL,
+patient_passport VARCHAR(50),
+date DATE NOT NULL,
+PRIMARY KEY(doctor_id, patient_passport, date),
+FOREIGN KEY (doctor_id) REFERENCES doctors (id),
+FOREIGN KEY (patient_passport) REFERENCES patient (passport)
+);
+
+INSERT INTO public.doctors (name_doc, speciality, price, percent) VALUES ('Anna', 'neurologist', 3500, 0.90);
+INSERT INTO public.doctors (name_doc, speciality, price, percent) VALUES ('Dennis', 'dentist', 4000, 0.90);
+INSERT INTO public.doctors (name_doc, speciality, price, percent) VALUES ('Iosif', 'therapist', 3000, 0.90);
+INSERT INTO public.doctors (name_doc, speciality, price, percent) VALUES ('Svetlana', 'psychologist', 3500, 0.90);
+
+INSERT INTO public.patient (passport, surname, name_patient, patronymic, birthdate, address) VALUES ('1','Ivanov', 'Ivan', 'Ivanovich', '1975-11-01', 'Nakhimovsky prospect, 12');
+INSERT INTO public.patient (passport, surname, name_patient, patronymic, birthdate, address) VALUES ('123','Ivanov', 'Vladimir', 'Ivanovich', '1977-10-05', 'Roshchinskiy proyezd
+, 14');
+INSERT INTO public.patient (passport, surname, name_patient, patronymic, birthdate, address) VALUES ('456','Kuznetsova', 'Julia', 'Sergeevna', '1989-09-05', 'ul. Ulofa Palme, 12');
+INSERT INTO public.patient (passport, surname, name_patient, patronymic, birthdate, address) VALUES ('789','Mikhailova', 'Nadezhda', 'Alekseevna', '1995-09-01', 'ul. myasnitskaya, 2');
+
+INSERT INTO public.reception (doctor_id, patient_passport, date) VALUES (1,'1','2030-11-01');
+INSERT INTO public.reception (doctor_id, patient_passport, date) VALUES (2,'123','2022-11-01');
+INSERT INTO public.reception (doctor_id, patient_passport, date) VALUES (3,'789','2031-11-01');
+INSERT INTO public.reception (doctor_id, patient_passport, date) VALUES (4,'456','2026-11-01');
+
+CREATE VIEW receipt AS 
+SELECT reception.date, patient.surname, patient.name_patient, patient.patronymic, doctors.name_doc,  doctors.price,  (doctors.price * doctors.percent * 0.87) AS pay
+FROM reception 
+JOIN patient ON patient.passport = reception.patient_passport
+JOIN doctors ON doctors.id = reception.doctor_id;
+
+SELECT * FROM receipt;
+
+
+
+###############################
+
+CREATE VIEW receipt AS 
+SELECT reception.doctor_id, reception.patient_passport, reception.date, patient.surname, patient.name_patient, patient.patronymic, doctors.name_doc,  doctors.price,  (doctors.price * doctors.percent * 0.87) AS pay
+FROM reception 
+JOIN patient ON patient.passport = reception.patient_passport
+JOIN doctors ON doctors.id = reception.doctor_id;
+
+SELECT * FROM receipt;

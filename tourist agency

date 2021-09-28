@@ -1,0 +1,35 @@
+CREATE TABLE users (
+passport VARCHAR (50) PRIMARY KEY,
+name VARCHAR (50) NOT NULL
+);
+
+CREATE TABLE paths (
+id SERIAL PRIMARY KEY,
+country VARCHAR (25) NOT NULL,
+price_visa NUMERIC(10,2) NOT NULL,
+price_day NUMERIC(10,2) NOT NULL,
+price_transport NUMERIC(10,2) NOT NULL
+);
+
+CREATE TABLE travels (
+path_id INT NOT NULL,
+user_passport VARCHAR(50),
+started_date DATE NOT NULL,
+PRIMARY KEY (path_id, user_passport, started_date),
+FOREIGN KEY (user_passport) REFERENCES users (passport),
+FOREIGN KEY (path_id) REFERENCES paths (id),
+days_count INT NOT NULL,
+travel_target VARCHAR (50) NOT NULL);
+
+INSERT INTO public.users VALUES('1','Dennis');
+INSERT INTO public.paths (country, price_visa, price_day, price_transport) VALUES ('Afghanistan',6000,600,650);
+INSERT INTO public.travels (path_id, user_passport, started_date, days_count, travel_target) VALUES (1,'1','2031-11-01',315,'treatment');
+
+
+CREATE VIEW travel_price AS
+SELECT travels.path_id, travels.user_passport, travels.started_date, travels.travel_target, (paths.price_day * travels.days_count + paths.price_visa + paths.price_transport) * 1.18 AS travel_price
+FROM paths, travels
+WHERE paths.id = travels.path_id;
+
+SELECT * FROM travel_price;
+ 
