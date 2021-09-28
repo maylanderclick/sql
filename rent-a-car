@@ -1,0 +1,50 @@
+CREATE TABLE client(
+client_name VARCHAR(50),
+passport VARCHAR(50) PRIMARY KEY
+);
+
+CREATE TABLE car(
+model VARCHAR(50),
+color VARCHAR(50),
+manufacture INT NOT NULL,
+license_plate VARCHAR(50) PRIMARY KEY,
+insurance_cost NUMERIC(10,2) NOT NULL,
+price_day NUMERIC(10,2) NOT NULL
+);
+
+CREATE TABLE rent(
+car_license_plate VARCHAR(50),
+client_passport VARCHAR(50),
+date DATE NOT NULL,
+day_number INT NOT NULL,
+PRIMARY KEY (car_license_plate, date),
+FOREIGN KEY (car_license_plate) REFERENCES car (license_plate),
+FOREIGN KEY (client_passport) REFERENCES client (passport)
+);
+
+INSERT INTO public.client (client_name, passport) VALUES ('Dennis', '123');
+INSERT INTO public.client (client_name, passport) VALUES ('Anna', '456');
+INSERT INTO public.client (client_name, passport) VALUES ('Olga', '789');
+INSERT INTO public.client (client_name, passport) VALUES ('Ivan', '963');
+
+INSERT INTO public.car (model, color, manufacture, license_plate, insurance_cost, price_day) VALUES ('KIA  Rio', 'black', 2013, 'T430CC', 615000, 2000);
+INSERT INTO public.car (model, color, manufacture, license_plate, insurance_cost, price_day) VALUES ('Skoda Rapid', 'white', 2016, 'K300AM', 660000, 2500);
+INSERT INTO public.car (model, color, manufacture, license_plate, insurance_cost, price_day) VALUES ('Skoda Octavia', 'white', 2016, 'H752KM', 700000, 3000);
+
+INSERT INTO public.rent (car_license_plate, client_passport, date, day_number) VALUES ('T430CC', '123', '2020-11-03', 3);
+INSERT INTO public.rent (car_license_plate, client_passport, date, day_number) VALUES ('K300AM', '456', '2020-04-10', 8);
+INSERT INTO public.rent (car_license_plate, client_passport, date, day_number) VALUES ('H752KM', '789', '2019-11-03', 7);
+INSERT INTO public.rent (car_license_plate, client_passport, date, day_number) VALUES ('T430CC', '963', '2021-01-11', 14);
+
+CREATE VIEW rental_cost AS
+SELECT car.license_plate, client.passport, client.client_name, rent.date, rent.day_number, (car.price_day * rent.day_number) AS rental_cost, car.insurance_cost * 0.1 AS insurance
+FROM rent 
+JOIN client ON rent.client_passport = client.passport
+JOIN car ON rent.car_license_plate = car.license_plate;
+
+SELECT * FROM rental_cost;
+
+
+
+##########
+
